@@ -10,13 +10,13 @@
 # https://render.com/docs/render-yml
 #
 
-# Defines the version of the render.yml specification.
-version: 1
-
 # Defines the services to be deployed. In this case, a single web service for n8n.
 services:
   - type: web
     plan: free
+    # This is the runtime for services that pull a prebuilt Docker image
+    runtime: image
+    # You can give the service any name
     name: n8n-service
     
     # The image to use for the deployment. We're using the official n8n Docker image.
