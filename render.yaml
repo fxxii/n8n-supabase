@@ -67,6 +67,12 @@ services:
       - key: N8N_BASIC_AUTH_PASSWORD
         # Generate a strong, random password.
         sync: false
+      - key: N8N_ENCRYPTION_KEY
+        # Generate a strong, random key.
+        sync: false
+      - key: WEBHOOK_URL
+        # Callback webhook
+        value: ${RENDER_EXTERNAL_URL}
         
     # Expose port 5678, which is the default port for n8n.
     # Render automatically maps this to an external port.
