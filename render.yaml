@@ -1,65 +1,88 @@
-# Use this Blueprint to deploy n8n on Render as a web
-# service that uses a Postgres database to store
-# workflow data.
+# This file defines the infrastructure for deploying an n8n service on Render.com.
+# It uses a web service to run n8n and connects to an external PostgreSQL database.
 #
-# This Blueprint uses free instance types (specified by
-# `plan`) for both the web service and the database. You
-# can upgrade to paid instance types at any time to
-# increase resources.
+# IMPORTANT: Replace the placeholder values with your actual Supabase credentials.
+#
+# To use this file, you must first create a Supabase project and get its
+# connection details.
+#
+# For more information on Render's 'render.yml' specification, see:
+# https://render.com/docs/render-yml
+#
 
+# Defines the version of the render.yml specification.
+version: v1
+
+# Defines the services to be deployed. In this case, a single web service for n8n.
 services:
   - type: web
-    plan: free
-    # This is the runtime for services that pull a prebuilt Docker image
-    runtime: image
-    # You can give the service any name
     name: n8n-service
+    
+    # The image to use for the deployment. We're using the official n8n Docker image.
+    # Note: Using an image is generally more reliable than a build command for complex apps.
     image:
-      # Pulls the n8n image tagged as latest from Docker Hub
-      url: docker.io/n8nio/n8n:latest
-
-    # All environment variables defined below are required!
-    #
-    # You can define additional environment variables as needed.
+      name: n8nio/n8n:latest
+      
+    # Environment variables are crucial for configuring n8n and the database connection.
+    # These should be securely stored on Render's dashboard and referenced here.
+    # You can also manually add them in the Render UI after creating the service.
     envVars:
-      # Generates a base64-encoded key for
-      # encrypting credentials in n8n
-      #
-      # Do not modify this value after it's generated!
-      # If you do, you'll lose access to all credentials
-      # encrypted with the previous value.
-      - key: N8N_ENCRYPTION_KEY
-        generateValue: true
-
-      # These automatically populate connection details 
-      # for the Render Postgres database defined below
+      # N8N-specific environment variables for webhooks and the editor.
+      - key: N8N_HOST
+        value: "n8n-service" # The internal service name
+      - key: N8N_PROTOCOL
+        value: "https"
+      - key: N8N_EDITOR_BASE_URL
+        # This will be automatically set by Render to your service's public URL.
+        # It's a key part of ensuring webhooks work correctly.
+        value: ${RENDER_EXTERNAL_URL}
+        
+      # Database configuration.
       - key: DB_TYPE
-        value: postgresdb
-      - key: DB_POSTGRESDB_DATABASE
-        fromDatabase:
-          name: n8n-db
-          property: database
+        value: "postgresdb"
       - key: DB_POSTGRESDB_HOST
-        fromDatabase:
-          name: n8n-db
-          property: host
-      - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase:
-          name: n8n-db
-          property: password
+        # Get this from your Supabase Project Settings -> Database.
+        sync: false
+        value: "db.your-supabase-project-id.supabase.co" # REPLACE_WITH_YOUR_SUPABASE_HOST
+      - key: DB_POSTGRESDB_DATABASE
+        # The database name is usually 'postgres' for Supabase.
+        sync: false
+        value: "postgres" # REPLACE_WITH_YOUR_DATABASE_NAME
       - key: DB_POSTGRESDB_USER
-        fromDatabase:
-          name: n8n-db
-          property: user
+        # This is the 'postgres' user, which is the default for Supabase.
+        sync: false
+        value: "postgres" # REPLACE_WITH_YOUR_SUPABASE_USER
+      - key: DB_POSTGRESDB_PASSWORD
+        # Get this from your Supabase Project Settings -> Database.
+        sync: false
+        value: "your_password" # REPLACE_WITH_YOUR_SUPABASE_PASSWORD
+      - key: DB_POSTGRESDB_PORT
+        # The default port for Supabase PostgreSQL.
+        value: "5432"
+        
+      # Other important n8n settings.
+      - key: GENERIC_TIMEZONE
+        value: "America/New_York" # Recommended
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true" # Always enable basic auth for security
+      - key: N8N_BASIC_AUTH_USER
+        value: "admin" # Change this to a secure username
+      - key: N8N_BASIC_AUTH_PASSWORD
+        # Generate a strong, random password.
+        sync: false
+        value: "a-very-secure-password-here"
+        
+    # Expose port 5678, which is the default port for n8n.
+    # Render automatically maps this to an external port.
+    healthCheckPath: /
+    
+    # The port the service listens on.
+    env: node
+    
+    # The command to start the service.
+    startCommand: "n8n start"
+    
+    # The name of the Dockerfile to use. Since we're using a public image, this is not needed.
+    # You would use this if you were building from a custom Dockerfile in your repo.
+    # dockerfilePath: Dockerfile
 
-databases:
-  - name: n8n-db
-    plan: free
-    # The free instance type is limited to 1 GB of disk
-    # space.
-    #
-    # If you later upgrade to a paid instance type, you can
-    # increase the disk size to any multiple of 5 GB by
-    # setting the `diskSizeGB` property.
-    #
-    # diskSizeGB: 5
