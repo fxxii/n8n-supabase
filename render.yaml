@@ -16,12 +16,13 @@ version: v1
 # Defines the services to be deployed. In this case, a single web service for n8n.
 services:
   - type: web
+    plan: free
     name: n8n-service
     
     # The image to use for the deployment. We're using the official n8n Docker image.
     # Note: Using an image is generally more reliable than a build command for complex apps.
     image:
-      name: n8nio/n8n:latest
+      url: docker.io/n8nio/n8n:latest
       
     # Environment variables are crucial for configuring n8n and the database connection.
     # These should be securely stored on Render's dashboard and referenced here.
