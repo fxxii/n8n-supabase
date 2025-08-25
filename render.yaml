@@ -11,7 +11,7 @@
 #
 
 # Defines the version of the render.yml specification.
-version: v1
+version: 1
 
 # Defines the services to be deployed. In this case, a single web service for n8n.
 services:
