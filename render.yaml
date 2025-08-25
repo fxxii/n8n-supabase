@@ -44,26 +44,22 @@ services:
       - key: DB_POSTGRESDB_HOST
         # Get this from your Supabase Project Settings -> Database.
         sync: false
-        value: "db.your-supabase-project-id.supabase.co" # REPLACE_WITH_YOUR_SUPABASE_HOST
       - key: DB_POSTGRESDB_DATABASE
         # The database name is usually 'postgres' for Supabase.
         sync: false
-        value: "postgres" # REPLACE_WITH_YOUR_DATABASE_NAME
       - key: DB_POSTGRESDB_USER
         # This is the 'postgres' user, which is the default for Supabase.
         sync: false
-        value: "postgres" # REPLACE_WITH_YOUR_SUPABASE_USER
       - key: DB_POSTGRESDB_PASSWORD
         # Get this from your Supabase Project Settings -> Database.
         sync: false
-        value: "your_password" # REPLACE_WITH_YOUR_SUPABASE_PASSWORD
       - key: DB_POSTGRESDB_PORT
         # The default port for Supabase PostgreSQL.
-        value: "5432"
+        sync: false
         
       # Other important n8n settings.
       - key: GENERIC_TIMEZONE
-        value: "America/New_York" # Recommended
+        value: "Europe/London" # Recommended
       - key: N8N_BASIC_AUTH_ACTIVE
         value: "true" # Always enable basic auth for security
       - key: N8N_BASIC_AUTH_USER
@@ -71,7 +67,6 @@ services:
       - key: N8N_BASIC_AUTH_PASSWORD
         # Generate a strong, random password.
         sync: false
-        value: "a-very-secure-password-here"
         
     # Expose port 5678, which is the default port for n8n.
     # Render automatically maps this to an external port.
